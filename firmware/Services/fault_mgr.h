@@ -1,6 +1,9 @@
 /**
  * @file fault_mgr.h
- * @brief Lightweight fault log (ring buffer) for UART FLT lines and status queries.
+ * @brief RAM ring buffer for faults (v0.1). UART FLT lines are post–v0.1.
+ *
+ * All APIs are task-context only in v0.1 (not ISR-safe). Updates are protected
+ * with FreeRTOS critical sections for multi-task use.
  */
 #ifndef FAULT_MGR_H
 #define FAULT_MGR_H

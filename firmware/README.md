@@ -7,7 +7,7 @@ Maintain product code under:
 - **`App/`** — application and RTOS task creation
 - **`Services/`** — **CLI**, **telemetry**, **fault_mgr**
 - **`modules/`** — **`sensor_hub`** and future chip-level glue (**not** Cube HAL)
-- **`Common/`** — **shared types**, **`log.h`**
+- **`Common/`** — **shared types**, **`log.h`**, **`log.c`** (mutex + `log_line`)
 
 **Recommendation:** Keep Cube’s HAL/CMSIS exclusively in the generated **`Drivers/`** folder. Put **`sensor_hub`** (and similar) in **`modules/`** so the directory name **`Drivers/`** never mixes ST HAL with authored files.
 

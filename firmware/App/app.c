@@ -19,7 +19,7 @@
 #include "stm32g4xx_hal.h"
 
 #ifndef APP_LED_GPIO_Port
-/** NUCLEO-G474RE: LD2 is typically PE8 — set in Cube or override here. */
+/** NUCLEO-G474RE: LD2 = PE8 — override if Cube uses different labels. */
 #define APP_LED_GPIO_Port GPIOE
 #define APP_LED_Pin GPIO_PIN_8
 #endif
@@ -54,7 +54,6 @@ static void boot_print_reason(void)
     LOG_LINE("BOOT mcu=STM32G474 t_ms=%lu reason=%s fw=%s cal=%u", (unsigned long)HAL_GetTick(),
              reason, APP_FW_VERSION_STR, s_cal_valid ? 1U : 0U);
 
-    /* Clear reset flags for next boot interpretation */
     __HAL_RCC_CLEAR_RESET_FLAGS();
 }
 
@@ -67,6 +66,7 @@ void app_init_early(void)
     s_last_sample_ms = 0U;
 
     fault_mgr_init();
+    log_init();
     telemetry_init();
     cli_init();
     (void)sensor_hub_init();
@@ -76,7 +76,9 @@ void app_init_early(void)
 
 void app_set_mode(app_state_t mode)
 {
+    taskENTER_CRITICAL();
     s_mode = mode;
+    taskEXIT_CRITICAL();
 }
 
 void app_get_status(app_status_t *out)
@@ -109,7 +111,13 @@ static void app_task_entry_impl(void *arg)
     uint32_t div = 0U;
 
     for (;;) {
-        if (s_mode == APP_STATE_RUN) {
+        app_state_t mode;
+
+        taskENTER_CRITICAL();
+        mode = s_mode;
+        taskEXIT_CRITICAL();
+
+        if (mode == APP_STATE_RUN) {
             sample_frame_t frame;
             (void)memset(&frame, 0, sizeof(frame));
             if (sensor_hub_read_all(&frame) == ST_OK) {

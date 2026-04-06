@@ -3,6 +3,7 @@
  */
 #include "telemetry.h"
 
+#include <stddef.h>
 #include <stdio.h>
 
 #include "FreeRTOS.h"
@@ -21,7 +22,6 @@ static void format_tlm_line(char *buf, size_t buf_sz, const sample_frame_t *f)
         return;
     }
 
-    /* tmp_c_milli -> decimal string without pulling in snprintf float. */
     int32_t c = f->tmp_c_milli;
     int32_t ci = c / 1000;
     int32_t cf = c % 1000;
@@ -44,6 +44,7 @@ void telemetry_init(void)
         return;
     }
     s_q = xQueueCreate(TELEMETRY_QUEUE_DEPTH, sizeof(sample_frame_t));
+    /* If queue allocation fails, telemetry_publish returns ST_ERR until fixed. */
 }
 
 status_t telemetry_publish(const sample_frame_t *frame)
@@ -66,6 +67,10 @@ void telemetry_task_entry(void *argument)
     char line[192];
 
     for (;;) {
+        if (s_q == NULL) {
+            vTaskDelay(pdMS_TO_TICKS(100));
+            continue;
+        }
         if (xQueueReceive(s_q, &frame, portMAX_DELAY) == pdTRUE) {
             format_tlm_line(line, sizeof(line), &frame);
             LOG_LINE("%s", line);

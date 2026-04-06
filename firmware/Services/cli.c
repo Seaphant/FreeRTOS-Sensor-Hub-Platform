@@ -16,7 +16,6 @@
 
 #include "stm32g4xx_hal.h"
 
-/* Cube-generated handle (LPUART1 VCP on NUCLEO-G474RE template). */
 extern UART_HandleTypeDef hlpuart1;
 
 static char s_line[CLI_LINE_MAX];
@@ -56,7 +55,6 @@ static void handle_line(const char *line)
         return;
     }
 
-    /* Trim leading spaces */
     while (*line == ' ' || *line == '\t') {
         line++;
     }
