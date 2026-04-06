@@ -1,0 +1,41 @@
+# STM32CubeIDE / Eclipse
+.metadata/
+RemoteSystemsTempFiles/
+**/.settings/language.settings.xml
+
+# Build outputs
+**/Debug/
+**/Release/
+**/build/
+**/*.o
+**/*.obj
+**/*.d
+**/*.su
+**/*.cyclo
+**/*.lst
+**/*.map
+**/*.elf
+**/*.bin
+**/*.hex
+
+# Cube backup
+*.ioc.bak
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+.vscode/*
+!.vscode/extensions.json
+!.vscode/tasks.json
+
+# Python
+scripts/.venv/
+**/__pycache__/
+*.pyc
+
+# Logs
+logs/*
+!logs/.gitkeep

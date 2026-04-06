@@ -1,0 +1,28 @@
+stm32-rtos-sensor-hub — v0.1
+
+  PC (USB serial)
+       |
+       v
+  LPUART1 (ST-Link VCP)
+       |
+  +----+----+
+  | cli_task |  help, status, start, stop
+  +----+----+
+       | app_* APIs
+  +----+----+
+  | app_task |  RUN/IDLE; sensor_hub_read_all (stub);
+  |          |  telemetry_publish; LED heartbeat
+  +----+----+
+       |
+       v
+  +-------------+
+  | telemetry   |  FreeRTOS queue (sample_frame_t)
+  | task        |
+  +------+------+
+         | printf / LOG_LINE
+         v
+      "TLM ..."
+
+  modules/sensor_hub.c ----(post-v0.1)----> I2C1 / HAL (hi2c1)
+
+  fault_mgr  <-- queue drop, CLI overflow (RAM only in v0.1)
