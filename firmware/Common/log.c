@@ -27,10 +27,10 @@ void log_line(const char *fmt, ...)
     }
 
     (void)vprintf(fmt, ap);
+    va_end(ap);
     (void)printf("\r\n");
 
     if (s_log_mu != NULL) {
         (void)xSemaphoreGive(s_log_mu);
     }
-    va_end(ap);
 }
