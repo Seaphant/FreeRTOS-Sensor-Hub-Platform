@@ -3,8 +3,10 @@
  */
 #include "telemetry.h"
 
+#include <limits.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <stdint.h>
 
 #include "FreeRTOS.h"
 #include "queue.h"
@@ -23,19 +25,23 @@ static void format_tlm_line(char *buf, size_t buf_sz, const sample_frame_t *f)
     }
 
     int32_t c = f->tmp_c_milli;
-    int32_t ci = c / 1000;
-    int32_t cf = c % 1000;
-    if (cf < 0) {
-        cf = -cf;
+    uint32_t mag;
+    if (c < 0) {
+        mag = (c == INT32_MIN) ? ((uint32_t)INT32_MAX + 1U) : (uint32_t)(-c);
+    } else {
+        mag = (uint32_t)c;
     }
+    long ci = (long)(mag / 1000U);
+    long cf = (long)(mag % 1000U);
 
     (void)snprintf(buf, buf_sz,
                    "TLM seq=%u t_ms=%lu imu_ax_mg=%d imu_ay_mg=%d imu_az_mg=%d "
-                   "gx_mdps=%d gy_mdps=%d gz_mdps=%d tmp_c=%ld.%03ld "
+                   "gx_mdps=%d gy_mdps=%d gz_mdps=%d tmp_c=%s%ld.%03ld "
                    "vbus_mv=%u i_ma=%d",
                    (unsigned)f->seq, (unsigned long)f->t_ms, (int)f->imu_ax_mg,
                    (int)f->imu_ay_mg, (int)f->imu_az_mg, (int)f->gx_mdps, (int)f->gy_mdps,
-                   (int)f->gz_mdps, (long)ci, (long)cf, (unsigned)f->vbus_mv, (int)f->i_ma);
+                   (int)f->gz_mdps, (c < 0) ? "-" : "", ci, cf, (unsigned)f->vbus_mv,
+                   (int)f->i_ma);
 }
 
 void telemetry_init(void)

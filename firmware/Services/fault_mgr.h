@@ -43,6 +43,7 @@ typedef struct {
 void fault_mgr_init(void);
 void fault_raise(fault_code_t code, fault_severity_t sev, const char *detail);
 void fault_clear_all(void);
+/** Monotonic count of faults logged at WARN severity or higher (never decremented). */
 uint32_t fault_active_count(void);
 uint32_t fault_snapshot(fault_record_t *out, uint32_t max_out);
 

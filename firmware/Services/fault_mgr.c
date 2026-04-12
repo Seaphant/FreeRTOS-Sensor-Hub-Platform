@@ -18,7 +18,7 @@
 static fault_record_t s_log[FAULT_LOG_CAPACITY];
 static uint32_t s_head;
 static uint32_t s_count;
-static uint32_t s_active;
+static uint32_t s_warn_event_count;
 
 static void copy_detail(char *dst, size_t dst_sz, const char *src)
 {
@@ -38,7 +38,7 @@ void fault_mgr_init(void)
     taskENTER_CRITICAL();
     s_head = 0U;
     s_count = 0U;
-    s_active = 0U;
+    s_warn_event_count = 0U;
     (void)memset(s_log, 0, sizeof(s_log));
     taskEXIT_CRITICAL();
 }
@@ -58,7 +58,7 @@ void fault_raise(fault_code_t code, fault_severity_t sev, const char *detail)
             s_count++;
         }
         if (sev >= FAULT_SEV_WARN) {
-            s_active++;
+            s_warn_event_count++;
         }
     }
     taskEXIT_CRITICAL();
@@ -74,7 +74,7 @@ uint32_t fault_active_count(void)
     uint32_t n;
 
     taskENTER_CRITICAL();
-    n = s_active;
+    n = s_warn_event_count;
     taskEXIT_CRITICAL();
     return n;
 }

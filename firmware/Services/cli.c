@@ -43,7 +43,7 @@ static void print_status(void)
         mode_str = "CAL";
     }
 
-    LOG_LINE("OK uptime_ms=%lu mode=%s imu_hz=%u slow_hz=%u last_sample_ms=%lu faults=%lu cal=%u",
+    LOG_LINE("OK uptime_ms=%lu mode=%s imu_hz=%u slow_hz=%u last_sample_ms=%lu fault_warn_events=%lu cal=%u",
              (unsigned long)st.uptime_ms, mode_str, (unsigned)st.imu_hz, (unsigned)st.slow_hz,
              (unsigned long)st.last_sample_ms, (unsigned long)fault_active_count(),
              st.cal_valid ? 1U : 0U);

@@ -30,10 +30,6 @@ static uint16_t s_slow_hz;
 static bool s_cal_valid;
 static uint32_t s_last_sample_ms;
 
-static TaskHandle_t s_app_task;
-static TaskHandle_t s_tlm_task;
-static TaskHandle_t s_cli_task;
-
 static void boot_print_reason(void)
 {
     uint32_t csr = RCC->CSR;
@@ -142,13 +138,8 @@ static void app_task_entry_impl(void *arg)
 void app_rtos_create_tasks(void)
 {
     (void)xTaskCreate(app_task_entry_impl, "app", APP_TASK_STACK_WORDS, NULL, APP_TASK_PRIORITY,
-                      &s_app_task);
+                      NULL);
     (void)xTaskCreate(telemetry_task_entry, "tlm", TELEMETRY_TASK_STACK_WORDS, NULL,
-                      TELEMETRY_TASK_PRIORITY, &s_tlm_task);
-    (void)xTaskCreate(cli_task_entry, "cli", CLI_TASK_STACK_WORDS, NULL, CLI_TASK_PRIORITY,
-                      &s_cli_task);
-
-    (void)s_app_task;
-    (void)s_tlm_task;
-    (void)s_cli_task;
+                      TELEMETRY_TASK_PRIORITY, NULL);
+    (void)xTaskCreate(cli_task_entry, "cli", CLI_TASK_STACK_WORDS, NULL, CLI_TASK_PRIORITY, NULL);
 }
