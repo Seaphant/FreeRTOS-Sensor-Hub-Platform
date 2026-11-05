@@ -25,3 +25,14 @@ jobs:
       - name: Print firmware size
         working-directory: firmware
         run: arm-none-eabi-size build/sensor-hub.elf
+
+  host-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fault log
+        run: |
+          cc -std=c11 -Wall -Wextra -Werror -I host/stubs -I firmware/Services \
+            host/test_fault_log.c firmware/Services/fault_mgr.c -o /tmp/fault_log
+          /tmp/fault_log

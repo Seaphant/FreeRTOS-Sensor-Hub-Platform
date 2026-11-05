@@ -71,12 +71,26 @@ Example telemetry line:
 TLM seq=0 t_ms=120 imu_ax_mg=0 imu_ay_mg=0 imu_az_mg=1000 gx_mdps=0 gy_mdps=0 gz_mdps=0 tmp_c=23.681 vbus_mv=3300 i_ma=0
 ```
 
+## Host checks
+
+The fault log is the piece exercised without a board. `host/test_fault_log.c` links `firmware/Services/fault_mgr.c` against stub `HAL_GetTick` and critical-section macros.
+
+```bash
+cc -std=c11 -Wall -Wextra -Werror -I host/stubs -I firmware/Services \
+  host/test_fault_log.c firmware/Services/fault_mgr.c -o /tmp/fault_log && /tmp/fault_log
+```
+
+Sixteen records fill the log. The seventeenth drops the oldest. An INFO record does not increment the warn count. A CLI overrun is stored as `cli_line`. Detail is cut at 23 characters.
+
+The sample `TLM` line in this README is a stand-in from `sensor_hub_read_all`. It is not a capture from an LSM6DSO, TMP117, or INA219.
+
 ## Current status
 
-- Current baseline: committed Cube/HAL/FreeRTOS project plus working application/task wiring
-- Validation evidence in the repo: source layout, `.ioc`, linker script, Makefile, UART protocol docs, and a manual smoke-test plan
-- GitHub Actions CI (ARM GCC build on every push)
-- Still pending: real LSM6DSO / TMP117 / INA219 drivers, WHO_AM_I checks, fault-on-wire reporting, watchdog policy, and calibration persistence
+- Fault log for telemetry queue drops and CLI overruns is host-checked
+- `app`, `tlm`, and `cli` tasks, LPUART1 retarget, and I2C1 init are in the Cube project
+- Sensor drivers are not on the bus yet. `sensor_hub_read_all` publishes the stand-in frame above
+- GitHub Actions builds the firmware with ARM GCC and runs the host fault-log check
+- Still pending: WHO_AM_I on the three sensors, a board flash of this tree, watchdog, calibration persistence
 
 ## Build / flash
 
